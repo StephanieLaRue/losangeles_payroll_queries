@@ -85,7 +85,7 @@ ORDER BY Year;
 SELECT
 	Year, 
     DepartmentTitle,
-    FORMAT(AVG(OvertimePay),'C') AS Avg_Overtime_Pay
+    FORMAT(AVG(OvertimePay),'C') AS AvgOvertimePay
 FROM losangeles_payroll
 WHERE OvertimePay > 0
 GROUP BY Year, DepartmentTitle
@@ -95,7 +95,7 @@ ORDER BY Year, DepartmentTitle;
 SELECT
 	Year, 
     DepartmentTitle,
-    FORMAT(SUM(OvertimePay),'C') AS Total_Overtime_Pay
+    FORMAT(SUM(OvertimePay),'C') AS TotalOvertimePay
 FROM losangeles_payroll
 WHERE OvertimePay > 0
 GROUP BY Year, DepartmentTitle
@@ -129,7 +129,6 @@ SELECT
     FORMAT(SUM(OvertimePay),'C') AS OvertimePaid,
     FORMAT(SUM(TotalPayments),'C') AS TotalPaid
 FROM losangeles_payroll
-WHERE TotalPayments > 0 AND OvertimePay > 0
 GROUP BY Year, DepartmentTitle
 ORDER BY Year, DepartmentTitle;
 
@@ -140,9 +139,8 @@ SELECT
     FORMAT(SUM(BasePay),'C') AS BasePay,
     FORMAT(SUM(OvertimePay),'C') AS OvertimePaid,
     FORMAT(SUM(TotalPayments),'C') AS TotalPaid,
-    FORMAT(SUM(OvertimePay)/SUM(TotalPayments)*100,'N') AS PercentOvertime
+    FORMAT(SUM(OvertimePay)/SUM(BasePay)*100,'N') AS PercentOvertime
 FROM losangeles_payroll
-WHERE TotalPayments > 0 AND OvertimePay > 0
 GROUP BY Year, DepartmentTitle
 ORDER BY Year, DepartmentTitle;
 
@@ -151,10 +149,9 @@ SELECT
 	Year, 
     DepartmentTitle,
     FORMAT(SUM(ProjectedAnnualSalary),'C') AS ProjectedAnnualSalary,
-    FORMAT(SUM(TotalPayments),'C') AS ActualPaid,
+    FORMAT(SUM(TotalPayments),'C') AS TotalPayments,
     FORMAT(SUM(ProjectedAnnualSalary-TotalPayments),'C') Difference
 FROM losangeles_payroll
-WHERE TotalPayments > 0 AND ProjectedAnnualSalary > 0
 GROUP BY Year, DepartmentTitle
 ORDER BY Year, DepartmentTitle;
 
@@ -163,10 +160,9 @@ SELECT
 	Year, 
     DepartmentTitle,
     FORMAT(SUM(ProjectedAnnualSalary),'C') AS ProjectedAnnualSalary,
-    FORMAT(SUM(TotalPayments),'C') AS ActualPaid,
-   FORMAT(((SUM(ProjectedAnnualSalary-TotalPayments))/SUM(ProjectedAnnualSalary))*100,'N') Percent_Difference
+    FORMAT(SUM(TotalPayments),'C') AS TotalPayments,
+   FORMAT(((SUM(TotalPayments-ProjectedAnnualSalary))/SUM(ProjectedAnnualSalary))*100,'N') PercentDifference
 FROM losangeles_payroll
-WHERE TotalPayments <> 0 AND ProjectedAnnualSalary <> 0 
 GROUP BY Year, DepartmentTitle
 ORDER BY Year, DepartmentTitle;
 
@@ -176,9 +172,8 @@ SELECT
     DepartmentTitle,
     FORMAT(SUM(TotalPayments),'C') AS ActualPaid,
     FORMAT(SUM(PaymentsOverBasePay),'C') OtherPayments,
-    FORMAT(SUM(TotalPayments)/SUM(PaymentsOverBasePay),'N') PercentOtherPayments
+    FORMAT(SUM(PaymentsOverBasePay)/SUM(TotalPayments) *100,'N') PercentOtherPayments
 FROM losangeles_payroll
-WHERE TotalPayments <> 0 AND OvertimePay <> 0 
 GROUP BY Year, DepartmentTitle
 ORDER BY Year, DepartmentTitle;
 
@@ -187,12 +182,11 @@ ORDER BY Year, DepartmentTitle;
 SELECT
 	Year, 
     DepartmentTitle,
-    FORMAT(SUM(TotalPayments),'C') AS ActualPaid,
+    FORMAT(SUM(TotalPayments),'C') TotalPayments,
     FORMAT(SUM(OvertimePay),'C') Overtime,
     FORMAT(SUM(PaymentsOverBasePay),'C') OtherPayments,
-    FORMAT((SUM(OvertimePay)+SUM(PaymentsOverBasePay))/SUM(TotalPayments)*100,'N') PercentOfActualPay
+    FORMAT((SUM(OvertimePay)+SUM(PaymentsOverBasePay))/SUM(TotalPayments)*100,'N') PercentOfTotal
 FROM losangeles_payroll
-WHERE TotalPayments <> 0 AND OvertimePay <> 0 
 GROUP BY Year, DepartmentTitle
 ORDER BY Year, DepartmentTitle;
 
@@ -203,7 +197,6 @@ SELECT
     EmploymentType,
     FORMAT(AVG(TotalPayments),'C') AS AvgPaid
 FROM losangeles_payroll
-WHERE TotalPayments <> 0
 GROUP BY Year, EmploymentType
 ORDER BY Year, EmploymentType;
 -- by department
@@ -213,7 +206,6 @@ SELECT
     DepartmentTitle,
     FORMAT(AVG(TotalPayments),'C') AS AvgPaid
 FROM losangeles_payroll
-WHERE TotalPayments <> 0
 GROUP BY Year, DepartmentTitle, EmploymentType
 ORDER BY Year, DepartmentTitle, EmploymentType, AvgPaid;
 
